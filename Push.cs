@@ -14,6 +14,9 @@ public class PushTrack : MonoBehavior
     [Tooltip("Instantiates this prefab on a plane at touch location")]
     GameObject arPrefab;
 
+    /// <summary>
+    /// The Prefab to instantiate on touch.
+    /// </summary>
     public GameObject placedPrefab
     {
         get { return arPrefab; }
@@ -38,8 +41,8 @@ public class PushTrack : MonoBehavior
     // Bool if moving or not (needed for Update())
     private bool objectMotion = false;
 
-    // Thrust value attached to the 
-    public float thrust
+    // Thrust value attached to the object
+    public float thrust;
 
     void Start()
     {
@@ -51,11 +54,32 @@ public class PushTrack : MonoBehavior
     spawnedObject.gameObject.SetActive(false);
     }
 
+    bool TryGetTouchPosition(out Vector2 touchPosition)
+    {
+#if UNITY_EDITOR
+        if (Input.GetMouseButton(0))
+        {
+            var mousePosition = Input.mousePosition;
+            touchPosition = new Vector2(mousePosition.x, mousePosition.y);
+            return true;
+        }
+#else
+        if (Input.touchCount > 0)
+        {
+            touchPosition = Input.GetTouch(0).position;
+            return true;
+        }
+#endif
+
+        touchPosition = default;
+        return false;
+    }
+
     void Update()
     {   
         // Check if object is moving, if so then move it
-        if (objectMotion)
-            spawnedObject.gameObject.transform += Vector3.up * 10.0f;
+        // if (objectMotion)
+        //     spawnedObject.gameObject.transform += Vector3.up * 10.0f;
 
         // Checks if screen pressed
         if (!TryGetTouchPosition(out Vector2 touchPosition))
@@ -64,17 +88,28 @@ public class PushTrack : MonoBehavior
         // List of AR Hits
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
-        // Get centerpoint of screen
-        var screenPoint = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 4);
-
         // Find raycast hit surface
-        if (sessionOrigin.Raycast(screenPoint, hits))
+        if (sessionOrigin.Raycast(touchPosition, hits))
         {
             // Find first hit
             hits.OrderBy(h => h.distance);
             var pose = hits[0].pose;
+            var hittype = hits[0].hitType;
             
-
+            // If hits the plane
+            if (hittype == ARPlane)
+            {
+                // TODO: this is gonna need to change once multiples added
+                if (spawnedObject == null) 
+                    spawnedObject = Instantiate(arPrefab, pose.position, pose.rotation);
+            }
+            else if (hittype == GameObject)
+            {
+                // TODO: This is where the magic physics happens (soon)
+                Vector3 cam_pos = 
+                Debug.DrawLine(Camera)
+                objectMotion = true;
+            }
         }
     }
 
