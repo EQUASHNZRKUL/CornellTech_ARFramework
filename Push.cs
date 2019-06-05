@@ -44,6 +44,16 @@ public class PushTrack : MonoBehavior
     // Thrust value attached to the object
     public float thrust;
 
+    // Camera associated with ARSessionOrigin
+// #if UNITY_EDITOR
+//     public new Camera arCamera;
+// #else
+//     public Camera arCamera;
+// #endif
+//     {
+//         get {return }
+//     }
+
     void Start()
     {
     // Ref to Ar session origin within GameObject
@@ -54,6 +64,13 @@ public class PushTrack : MonoBehavior
     spawnedObject.gameObject.SetActive(false);
     }
 
+    //TODO: Why is this necessary? Awake vs Start?
+    void Awake()
+    {
+        ARRaycastManager RaycastManager; 
+    }
+
+    //TODO: What is out?
     bool TryGetTouchPosition(out Vector2 touchPosition)
     {
 #if UNITY_EDITOR
