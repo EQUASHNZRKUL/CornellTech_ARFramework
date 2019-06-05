@@ -44,16 +44,6 @@ public class PushTrack : MonoBehavior
     // Thrust value attached to the object
     public float thrust;
 
-    // Camera associated with ARSessionOrigin
-// #if UNITY_EDITOR
-//     public new Camera arCamera;
-// #else
-//     public Camera arCamera;
-// #endif
-//     {
-//         get {return }
-//     }
-
     void Start()
     {
     // Ref to Ar session origin within GameObject
@@ -123,8 +113,8 @@ public class PushTrack : MonoBehavior
             else if (hittype == GameObject)
             {
                 // TODO: This is where the magic physics happens (soon)
-                Vector3 cam_pos = 
-                Debug.DrawLine(Camera)
+                Vector3 cam_pos = sessionOrigin.camera.transform.position;
+                Debug.DrawLine(cam_pos, hits[0].point, Color.red);
                 objectMotion = true;
             }
         }
