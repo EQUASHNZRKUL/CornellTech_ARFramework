@@ -17,7 +17,6 @@ public class ARPushable : MonoBehaviour
     [SerializeField]
     [Tooltip("Instantiates this prefab on a plane at the touch location.")]
     GameObject m_PlacedPrefab;
-
     /// <summary>
     /// The prefab to instantiate on touch.
     /// </summary>
@@ -31,6 +30,25 @@ public class ARPushable : MonoBehaviour
     /// The object instantiated as a result of a successful raycast intersection with a plane.
     /// </summary>
     public GameObject spawnedObject { get; private set; }
+
+
+    [SerializeField]
+    [Tooltip("Instantiates this prefab on a gameObject at the touch location.")]
+    GameObject m_PhysicalPrefab;
+    /// <summary>
+    /// The prefab to instantiate on touch.
+    /// </summary>
+    public GameObject physicalPrefab
+    {
+        get { return m_PhysicalPrefab; }
+        set { m_PhysicalPrefab = value; }
+    }
+
+    /// <summary>
+    /// The object instantiated as a result of a successful raycast intersection with a plane.
+    /// </summary>
+    public GameObject spawnedObject { get; private set; }
+
 
     void Awake()
     {
