@@ -11,7 +11,7 @@ using UnityEngine.XR.ARSubsystems;
 /// and moved to the hit position.
 /// </summary>
 [RequireComponent(typeof(ARRaycastManager))]
-public class PlaceOnPlane : MonoBehaviour
+public class ARPushable : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Instantiates this prefab on a plane at the touch location.")]
