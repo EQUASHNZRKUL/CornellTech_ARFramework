@@ -78,7 +78,7 @@ public class ARPushable : MonoBehaviour
                 spawnedObject.transform.position = hitPose.position;
             }
         }
-        else if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinInfinity))
+        else if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
         {
             var hitPose = s_Hits[0].pose;
             Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
