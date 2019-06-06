@@ -54,7 +54,7 @@ public class Push : MonoBehavior
     spawnedObject.gameObject.SetActive(false);
     }
 
-    //TODO: Why is this necessary? Awake vs Start?
+    // Awake is run on Load.
     void Awake()
     {
         ARRaycastManager RaycastManager; 
