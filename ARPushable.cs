@@ -34,6 +34,7 @@ public class ARPushable : MonoBehaviour
     void Awake()
     {
         m_RaycastManager = GetComponent<ARRaycastManager>();
+        m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
 
     bool TryGetTouchPosition(out Vector2 touchPosition)
@@ -80,7 +81,7 @@ public class ARPushable : MonoBehaviour
         else if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinInfinity))
         {
             var hitPose = s_Hits[0].pose;
-            Vector3 cam_pos = sessionOrigin.camera.transform.position;
+            Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
             Debug.DrawLine(cam_pos, hitPose.position, Color.red);
         }
     }
@@ -88,4 +89,6 @@ public class ARPushable : MonoBehaviour
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
     ARRaycastManager m_RaycastManager;
+
+    ARSessionOrigin m_SessionOrigin;
 }
