@@ -109,7 +109,7 @@ public class ARPushable : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             Console.WriteLine("Raycast Hit");
-            if (hit.collider != null)
+            if (hit.collider.gameObject.tag("AR Placed Sphere"))
             {
                 var hitPose = hit.pose;
                 hit.collider.enabled = false;
