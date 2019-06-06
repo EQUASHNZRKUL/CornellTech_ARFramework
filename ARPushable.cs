@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
@@ -33,6 +34,7 @@ public class ARPushable : MonoBehaviour
 
     void Awake()
     {
+        Console.WriteLine("StartTest");
         m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
@@ -88,6 +90,7 @@ public class ARPushable : MonoBehaviour
         // Debug.DrawRay(transform.position, )
         if (Physics.Raycast(ray, out hit))
         {
+            Console.WriteLine("Raycast Hit");
             if (hit.collider != null)
             {
                 var hitPose = s_Hits[0].pose;
