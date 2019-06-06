@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
+// using Unity.Collections;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -9,7 +9,7 @@ using UnityEngine.XR.ARSubsystems;
 /// Represents a ball moved by raycasts/taps that is created when raycast intersects a plane. 
 /// </summary>
 [RequireComponent(typeof(ARRaycastManager))]
-public class Pushable : MonoBehavior
+public class ARPushable : MonoBehaviour
 {
     // Obj prefab ref
     [SerializeField]
@@ -47,6 +47,7 @@ public class Pushable : MonoBehavior
     void Start()
     {
     // Ref to Ar session origin within GameObject
+    Debug.Log("Start Test");
     sessionOrigin = GetComponent<ARSessionOrigin>();
 
     // Instance of object to be hidden until placed. 
@@ -57,7 +58,7 @@ public class Pushable : MonoBehavior
     // Awake is run on Load.
     void Awake()
     {
-        ARRaycastManager RaycastManager; 
+        RaycastManager = GetComponent<ARRaycastManager>(); 
     }
 
     //TODO: What is out?
@@ -95,28 +96,31 @@ public class Pushable : MonoBehavior
         // List of AR Hits
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
-        // Find raycast hit surface
-        if (sessionOrigin.Raycast(touchPosition, hits))
-        {
+        if (RaycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
+        { // If raycast hits a plane
+            Debug.Log("HIT");
             // Find first hit
-            hits.OrderBy(h => h.distance);
+            // hits.OrderBy(h => h.distance);
             var pose = hits[0].pose;
             var hittype = hits[0].hitType;
-            
-            // If hits the plane
-            if (hittype == ARPlane)
-            {
-                // TODO: this is gonna need to change once multiples added
-                if (spawnedObject == null) 
-                    spawnedObject = Instantiate(arPrefab, pose.position, pose.rotation);
-            }
-            else if (hittype == GameObject)
-            {
-                // TODO: This is where the magic physics happens (soon)
-                Vector3 cam_pos = sessionOrigin.camera.transform.position;
-                Debug.DrawLine(cam_pos, hits[0].point, Color.red);
-                objectMotion = true;
-            }
+            // TODO: this is gonna need to change once multiples added
+            if (spawnedObject == null) 
+                Debug.Log("Instantiate");
+                spawnedObject = Instantiate(arPrefab, pose.position, pose.rotation);
         }
+        else 
+        // if (RaycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinInfinity))
+        { // if raycast hits anything else
+            var pose = hits[0].pose;
+            var hittype = hits[0].hitType;
+            Debug.Log("MISS");
+            // TODO: This is where the physics happens
+            Vector3 cam_pos = sessionOrigin.camera.transform.position;
+            Debug.DrawLine(cam_pos, pose.position, Color.red);
+            objectMotion = true;
+        }
+        // else {
+        //     Debug.Log("MISS")
+        // }
     }
 }
