@@ -119,8 +119,5 @@ public class ARPushable : MonoBehaviour
             Debug.DrawLine(cam_pos, pose.position, Color.red);
             objectMotion = true;
         }
-        // else {
-        //     Debug.Log("MISS")
-        // }
     }
 }
