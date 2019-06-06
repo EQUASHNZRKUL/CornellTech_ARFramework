@@ -108,10 +108,11 @@ public class ARPushable : MonoBehaviour
         // Debug.DrawRay(transform.position, )
         if (Physics.Raycast(ray, out hit))
         {
+            Debug.Log("Raycast Hit");
             Console.WriteLine("Raycast Hit");
-            if (hit.collider.gameObject.tag("AR Placed Sphere"))
+            if (hit.collider.gameObject.tag == "Phys Spawn")
             {
-                var hitPose = hit.pose;
+                var hitPose = hit.transform;
                 hit.collider.enabled = false;
                 if (spawnedObject == null)
                     spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
