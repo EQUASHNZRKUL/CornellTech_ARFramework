@@ -33,7 +33,7 @@ public class ARPushable : MonoBehaviour
 
     void Awake()
     {
-        m_RaycastManager = GetComponent<ARRaycastManager>();
+        m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
 
@@ -60,10 +60,12 @@ public class ARPushable : MonoBehaviour
 
     void Update()
     {
+        // Checks for inputs
         if (!TryGetTouchPosition(out Vector2 touchPosition))
             return;
 
-        if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
+        // Checks for ARRaycast intersection with ARPlane
+        if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
         {
             // Raycast hits are sorted by distance, so the first one
             // will be the closest hit.
@@ -78,17 +80,26 @@ public class ARPushable : MonoBehaviour
                 spawnedObject.transform.position = hitPose.position;
             }
         }
-        else if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
+        // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
+
+        // TODO: figure out which of these should come first (distance function). 
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+        // Debug.DrawRay(transform.position, )
+        if (Physics.Raycast(ray, out hit))
         {
-            var hitPose = s_Hits[0].pose;
-            Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
-            Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+            if (hit.collider != null)
+            {
+                var hitPose = s_Hits[0].pose;
+                Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
+                Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+            }
         }
     }
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
-    ARRaycastManager m_RaycastManager;
+    ARRaycastManager m_ARRaycastManager;
 
     ARSessionOrigin m_SessionOrigin;
 }
