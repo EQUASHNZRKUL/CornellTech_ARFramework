@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 /// <summary>
 /// Represents a ball moved by raycasts/taps that is created when raycast intersects a plane. 
@@ -14,20 +16,18 @@ public class Push : MonoBehavior
     [Tooltip("Instantiates this prefab on a plane at touch location")]
     GameObject arPrefab;
 
-    /// <summary>
     /// The Prefab to instantiate on touch.
-    /// </summary>
     public GameObject placedPrefab
     {
         get { return arPrefab; }
         set { arPrefab = value; }
     }
 
-    // Object ref
+    // Visible, spawned object ref
     public GameObject spawnedObject {get; private set; }
 
     // Event to invoke for placing objects on planes.
-    public static event Action planePlacedObject;
+    // public static event Action planePlacedObject;
 
     // Session Origin ref; used to make raycasts
     private ARSessionOrigin sessionOrigin;
@@ -36,13 +36,13 @@ public class Push : MonoBehavior
     ARRaycastManager RaycastManager; 
 
     // Frag if object was placed or it should be moved
-    private bool objectPlaced = false;
+    // private bool objectPlaced = false;
 
     // Bool if moving or not (needed for Update())
     private bool objectMotion = false;
 
     // Thrust value attached to the object
-    public float thrust;
+    // public float thrust;
 
     void Start()
     {
@@ -50,8 +50,8 @@ public class Push : MonoBehavior
     sessionOrigin = GetComponent<ARSessionOrigin>();
 
     // Instance of object to be hidden until placed. 
-    spawnedObject = Instantiate(arPrefab);
-    spawnedObject.gameObject.SetActive(false);
+    // spawnedObject = Instantiate(arPrefab);
+    // spawnedObject.gameObject.SetActive(false);
     }
 
     // Awake is run on Load.
