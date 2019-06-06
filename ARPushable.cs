@@ -94,8 +94,17 @@ public class ARPushable : MonoBehaviour
             if (hit.collider != null)
             {
                 var hitPose = s_Hits[0].pose;
-                Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
-                Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+                if (hit.collider != null)
+                {
+                    hit.collider.enabled = false;
+                    if (spawnedObject == null)
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                    else
+                        spawnedObject.transform.position = hitPose.position;
+                    // Maybe try spawning a different object?
+                }
+                // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
+                // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
             }
         }
     }
