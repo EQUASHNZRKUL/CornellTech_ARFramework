@@ -7,7 +7,7 @@ using UnityEngine;
 /// Represents a ball moved by raycasts/taps that is created when raycast intersects a plane. 
 /// </summary>
 [RequireComponent(typeof(ARRaycastManager))]
-public class PushTrack : MonoBehavior
+public class Push : MonoBehavior
 {
     // Obj prefab ref
     [SerializeField]
