@@ -32,22 +32,22 @@ public class ARPushable : MonoBehaviour
     public GameObject spawnedObject { get; private set; }
 
 
-    // [SerializeField]
-    // [Tooltip("Instantiates this prefab on a gameObject at the touch location.")]
-    // GameObject m_PhysicalPrefab;
-    // /// <summary>
-    // /// The prefab to instantiate on touch.
-    // /// </summary>
-    // public GameObject physicalPrefab
-    // {
-    //     get { return m_PhysicalPrefab; }
-    //     set { m_PhysicalPrefab = value; }
-    // }
+    [SerializeField]
+    [Tooltip("Instantiates this prefab on a gameObject at the touch location.")]
+    GameObject m_PhysicalPrefab;
+    /// <summary>
+    /// The prefab to instantiate on touch.
+    /// </summary>
+    public GameObject physicalPrefab
+    {
+        get { return m_PhysicalPrefab; }
+        set { m_PhysicalPrefab = value; }
+    }
 
-    // /// <summary>
-    // /// The object instantiated as a result of a successful raycast intersection with a plane.
-    // /// </summary>
-    // public GameObject testObject { get; private set; }
+    /// <summary>
+    /// The object instantiated as a result of a successful raycast intersection with a plane.
+    /// </summary>
+    public GameObject testObject { get; private set; }
 
 
     void Awake()
@@ -84,8 +84,29 @@ public class ARPushable : MonoBehaviour
         if (!TryGetTouchPosition(out Vector2 touchPosition))
             return;
 
+        // TODO: figure out which of these should come first (distance function). 
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+        // Debug.DrawRay(transform.position, )
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log("Raycast Hit");
+            Console.WriteLine("Raycast Hit");
+            if (hit.collider.gameObject.tag == "Phys Spawn")
+            {
+                var hitPose = hit.transform;
+                hit.collider.enabled = false;
+                // if (spawnedObject == null)
+                testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
+                // else
+                //     spawnedObject.transform.position = hitPose.position;
+                // Maybe try spawning a different object?
+                // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
+                // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+            }
+        }
         // Checks for ARRaycast intersection with ARPlane
-        if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
+        else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
         {
             // Raycast hits are sorted by distance, so the first one
             // will be the closest hit.
@@ -101,28 +122,6 @@ public class ARPushable : MonoBehaviour
             }
         }
         // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
-
-        // TODO: figure out which of these should come first (distance function). 
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
-        // Debug.DrawRay(transform.position, )
-        if (Physics.Raycast(ray, out hit))
-        {
-            Debug.Log("Raycast Hit");
-            Console.WriteLine("Raycast Hit");
-            if (hit.collider.gameObject.tag == "Phys Spawn")
-            {
-                var hitPose = hit.transform;
-                hit.collider.enabled = false;
-                if (spawnedObject == null)
-                    spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                else
-                    spawnedObject.transform.position = hitPose.position;
-                // Maybe try spawning a different object?
-                // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
-                // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
-            }
-        }
     }
 
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
