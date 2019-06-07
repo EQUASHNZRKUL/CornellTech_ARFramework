@@ -81,15 +81,13 @@ public class ARPushable : MonoBehaviour
             {
                 Debug.Log("Raycast Hit");
                 Console.WriteLine("Raycast Hit");
-                if (hit.collider.gameObject.tag == "Phys Spawn")
+                if (hit.collider.gameObject.tag != "Plane Spawn")
                 {
                     var hitPose = hit.transform;
                     hit.collider.enabled = false;
                     testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-                    if (onPlacedObject != null)
-                        onPlacedObject();
-                    // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
-                    // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+                    // if (onPlacedObject != null)
+                    //     onPlacedObject();
                 }
                 // Checks for ARRaycast intersection with ARPlane
                 else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
