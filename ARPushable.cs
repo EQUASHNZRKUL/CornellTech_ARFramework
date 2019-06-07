@@ -88,6 +88,12 @@ public class ARPushable : MonoBehaviour
         }
     }
 
+    void SendMessageTo(GameObject target, string message) 
+    {
+        if (target)
+            target.SendMessage(message, spawnedObject, SendMessageOptions.DontRequireReceiver);
+    }
+
     void Update()
     {
         // Checks for inputs
@@ -105,9 +111,10 @@ public class ARPushable : MonoBehaviour
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
-                    var hitPose = hit.transform;
+                    SendMessageTo(spawnedObject, OnRaycastEnterMessage);
+                    // var hitPose = hit.transform;
                     // var viewpoint = Camera.main.WorldToViewportPoint(hit.point);
-                    testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
+                    // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                 }
                 else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
