@@ -93,7 +93,7 @@ public class ARPushable : MonoBehaviour
                 }
             }
             // Checks for ARRaycast intersection with ARPlane
-            else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
+            else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
             {
                 // Raycast hits are sorted by distance, so the first one
                 // will be the closest hit.
@@ -108,8 +108,8 @@ public class ARPushable : MonoBehaviour
                 }
             }
         // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
+        }
     }
-
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
     ARRaycastManager m_ARRaycastManager;
