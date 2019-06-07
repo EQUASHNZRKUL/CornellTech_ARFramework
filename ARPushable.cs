@@ -80,31 +80,20 @@ public class ARPushable : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 Debug.Log("Raycast Hit");
-                Console.WriteLine("Raycast Hit");
-                if (hit.collider.gameObject.tag != "Plane Spawn")
-                {
-                    var hitPose = hit.transform;
+                if (hit.rigidbody != null) {
+                    var hitPose = hit.transform; 
                     hit.collider.enabled = false;
                     testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-                    // if (onPlacedObject != null)
-                    //     onPlacedObject();
                 }
-                // Checks for ARRaycast intersection with ARPlane
                 else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
                 {
-                    // Raycast hits are sorted by distance, so the first one will be the closest hit.
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null)
-                    {
-                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                    }
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation); 
                     else
-                    {
-                        spawnedObject.transform.position = hitPose.position;
-                    }
+                        spawnedObject.transform.position = hitPose.position; 
                 }
             }
-        // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
         }
     }
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
