@@ -81,44 +81,43 @@ public class ARPushable : MonoBehaviour
     void Update()
     {
         // Checks for inputs
-        if (!TryGetTouchPosition(out Vector2 touchPosition))
+        // if (!TryGetTouchPosition(out Vector2 touchPosition))
+        //     return;
+        if (Input.touchCount <= 0)
             return;
 
+        Touch touch = Input.GetTouch(0);
         // TODO: figure out which of these should come first (distance function). 
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
-        // Debug.DrawRay(transform.position, )
-        if (Physics.Raycast(ray, out hit))
-        {
-            Debug.Log("Raycast Hit");
-            Console.WriteLine("Raycast Hit");
-            if (hit.collider.gameObject.tag == "Phys Spawn")
-            {
-                var hitPose = hit.transform;
-                hit.collider.enabled = false;
-                // if (spawnedObject == null)
-                testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-                // else
-                //     spawnedObject.transform.position = hitPose.position;
-                // Maybe try spawning a different object?
-                // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
-                // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
-            }
-        }
-        // Checks for ARRaycast intersection with ARPlane
-        else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
-        {
-            // Raycast hits are sorted by distance, so the first one
-            // will be the closest hit.
-            var hitPose = s_Hits[0].pose;
 
-            if (spawnedObject == null)
+        if (touch.phase == TouchPhase.Began)
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+            // Debug.DrawRay(transform.position, )
+            if (Physics.Raycast(ray, out hit))
             {
-                spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                Debug.Log("Raycast Hit");
+                Console.WriteLine("Raycast Hit");
+                if (hit.collider.gameObject.tag == "Phys Spawn")
+                {
+                    var hitPose = hit.transform;
+                    hit.collider.enabled = false;
+                    testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
+                    if (onPlacedObject != null)
+                        onPlacedObject();
+                    // Vector3 cam_pos = m_SessionOrigin.camera.transform.position;
+                    // Debug.DrawLine(cam_pos, hitPose.position, Color.red);
+                }
             }
-            else
+            // Checks for ARRaycast intersection with ARPlane
+            else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
             {
-                spawnedObject.transform.position = hitPose.position;
+                // Raycast hits are sorted by distance, so the first one
+                // will be the closest hit.
+                Pose hitPose = s_Hits[0].pose;
+                spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                if (onPlacedObject != null)
+                    onPlacedObject();
             }
         }
         // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
