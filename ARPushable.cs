@@ -92,8 +92,7 @@ public class ARPushable : MonoBehaviour
                 // Checks for ARRaycast intersection with ARPlane
                 else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
                 {
-                    // Raycast hits are sorted by distance, so the first one
-                    // will be the closest hit.
+                    // Raycast hits are sorted by distance, so the first one will be the closest hit.
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null)
                     {
