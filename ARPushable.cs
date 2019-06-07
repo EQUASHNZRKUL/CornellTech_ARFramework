@@ -107,7 +107,7 @@ public class ARPushable : MonoBehaviour
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
                     var hitPose = hit.transform;
                     // TODO: This line may be causing the phasing issues
-                    hit.collider.enabled = false;
+                    // hit.collider.enabled = false;
                     testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
                 }
                 else { //ARRayIntersect();
