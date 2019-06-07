@@ -49,33 +49,17 @@ public class ARPushable : MonoBehaviour
     /// </summary>
     public GameObject testObject { get; private set; }
 
+    /// <summary>
+    /// Invoked whenever an object is placed in on a plane.
+    /// </summary>
+    public static event Action onPlacedObject;
+
 
     void Awake()
     {
         Console.WriteLine("StartTest");
         m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
-    }
-
-    bool TryGetTouchPosition(out Vector2 touchPosition)
-    {
-#if UNITY_EDITOR
-        if (Input.GetMouseButton(0))
-        {
-            var mousePosition = Input.mousePosition;
-            touchPosition = new Vector2(mousePosition.x, mousePosition.y);
-            return true;
-        }
-#else
-        if (Input.touchCount > 0)
-        {
-            touchPosition = Input.GetTouch(0).position;
-            return true;
-        }
-#endif
-
-        touchPosition = default;
-        return false;
     }
 
     void Update()
@@ -92,8 +76,7 @@ public class ARPushable : MonoBehaviour
         if (touch.phase == TouchPhase.Began)
         {
             RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(touchPosition);
-            // Debug.DrawRay(transform.position, )
+            Ray ray = Camera.main.ScreenPointToRay(touch.position);
             if (Physics.Raycast(ray, out hit))
             {
                 Debug.Log("Raycast Hit");
@@ -110,7 +93,7 @@ public class ARPushable : MonoBehaviour
                 }
             }
             // Checks for ARRaycast intersection with ARPlane
-            else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
+            else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
             {
                 // Raycast hits are sorted by distance, so the first one
                 // will be the closest hit.
