@@ -62,6 +62,33 @@ public class ARPushable : MonoBehaviour
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
 
+    /// <summary>
+    /// Handles logic if Physics.Raycast finds a valid collision. 
+    /// </summary>
+    void PhysicsRayIntersect() {
+        var hitPose = hit.transform;
+        // TODO: This line may be causing the phasing issues
+        hit.collider.enabled = false;
+        testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
+        return true; 
+    }
+
+    /// <summary>
+    /// Handles logic if ARRaycast finds a collision. 
+    /// </summary>
+    void ARRayIntersect() {
+        // Raycast hits are sorted by distance, so the first one will be the closest hit.
+        var hitPose = s_Hits[0].pose;
+        if (spawnedObject == null)
+        {
+            spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+        }
+        else
+        {
+            spawnedObject.transform.position = hitPose.position;
+        }
+    }
+
     void Update()
     {
         // Checks for inputs
@@ -69,29 +96,23 @@ public class ARPushable : MonoBehaviour
         //     return;
         if (Input.touchCount <= 0)
             return;
-
         Touch touch = Input.GetTouch(0);
-        // TODO: figure out which of these should come first (distance function). 
-
         if (touch.phase == TouchPhase.Began)
         {
+            // Distance calculations
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(touch.position);
-            if (Physics.Raycast(ray, out hit))
-            {
-                Debug.Log("Raycast Hit");
-                Console.WriteLine("Raycast Hit");
-                if (hit.collider.gameObject.tag != "Plane Spawn")
-                {
+            bool physRayBool = Physics.Raycast(ray, out hit);
+            bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
+            if (physRayBool) { // PhysicsRayIntersect();
+                if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
                     var hitPose = hit.transform;
+                    // TODO: This line may be causing the phasing issues
                     hit.collider.enabled = false;
                     testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-                    // if (onPlacedObject != null)
-                    //     onPlacedObject();
+                    return true; 
                 }
-                // Checks for ARRaycast intersection with ARPlane
-                else if (m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon))
-                {
+                else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null)
@@ -104,7 +125,6 @@ public class ARPushable : MonoBehaviour
                     }
                 }
             }
-        // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
         }
     }
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
@@ -112,4 +132,6 @@ public class ARPushable : MonoBehaviour
     ARRaycastManager m_ARRaycastManager;
 
     ARSessionOrigin m_SessionOrigin;
+
+            // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
 }
