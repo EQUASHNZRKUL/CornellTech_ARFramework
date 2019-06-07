@@ -65,18 +65,17 @@ public class ARPushable : MonoBehaviour
     /// <summary>
     /// Handles logic if Physics.Raycast finds a valid collision. 
     /// </summary>
-    void PhysicsRayIntersect() {
+    void PhysicsRayIntersect(RaycastHit hit) {
         var hitPose = hit.transform;
         // TODO: This line may be causing the phasing issues
         hit.collider.enabled = false;
         testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-        return true; 
     }
 
     /// <summary>
     /// Handles logic if ARRaycast finds a collision. 
     /// </summary>
-    void ARRayIntersect() {
+    void ARRayIntersect(List<ARRaycastHit> s_Hits) {
         // Raycast hits are sorted by distance, so the first one will be the closest hit.
         var hitPose = s_Hits[0].pose;
         if (spawnedObject == null)
@@ -110,7 +109,6 @@ public class ARPushable : MonoBehaviour
                     // TODO: This line may be causing the phasing issues
                     hit.collider.enabled = false;
                     testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-                    return true; 
                 }
                 else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
