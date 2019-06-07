@@ -81,8 +81,7 @@ public class ARPushable : MonoBehaviour
             {
                 Debug.Log("Raycast Hit");
                 Console.WriteLine("Raycast Hit");
-                // if (hit.collider.gameObject.tag != "Plane Spawn")
-                if (hit.rigidbody != null)
+                if (hit.collider.gameObject.tag != "Plane Spawn")
                 {
                     var hitPose = hit.transform;
                     hit.collider.enabled = false;
