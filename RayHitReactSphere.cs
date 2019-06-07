@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
 
-public class RayHitReact : MonoBehaviour, IPointerEnterHandler
+public class RayHitReactSphere : MonoBehaviour, IPointerEnterHandler
 {
     public float JUMP_FORCE = 1.0f;
 
