@@ -49,7 +49,7 @@ public class ARPushable : MonoBehaviour
     /// </summary>
     public GameObject testObject { get; private set; }
 
-    public float JUMP_FORCE = 10.0f;
+    public float JUMP_FORCE;
 
     void Awake()
     {
@@ -57,36 +57,6 @@ public class ARPushable : MonoBehaviour
         Debug.Log("StartTest");
         m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
-    }
-
-    /// <summary>
-    /// Handles logic if Physics.Raycast finds a valid collision. 
-    /// </summary>
-    void PhysicsRayIntersect(RaycastHit hit) {
-        var hitPose = hit.transform;
-        testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
-    }
-
-    /// <summary>
-    /// Handles logic if ARRaycast finds a collision. 
-    /// </summary>
-    void ARRayIntersect(List<ARRaycastHit> s_Hits) {
-        // Raycast hits are sorted by distance, so the first one will be the closest hit.
-        var hitPose = s_Hits[0].pose;
-        if (spawnedObject == null)
-        {
-            spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-        }
-        else
-        {
-            spawnedObject.transform.position = hitPose.position;
-        }
-    }
-
-    void SendMessageTo(GameObject target, string message) 
-    {
-        if (target)
-            target.SendMessage(message, spawnedObject, SendMessageOptions.DontRequireReceiver);
     }
 
     void Update()
@@ -113,9 +83,9 @@ public class ARPushable : MonoBehaviour
                     // var hitPose = hit.transform;
                     // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     Debug.Log(hit.rigidbody);
-                    // TODO: Try translation, could be an issue with Force.
+                    Vector3 forceDirection = hit.normal * -1.0f;
                     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
-                    spawnedObject.transform.Translate(Vector3.up * 0.5f);
+                    spawnedObject.transform.Translate(forceDirection * 0.1f);
                 }
                 else if (spawnedCollider.gameObject.tag == "Plane Spawn") 
                 { // Hits the plane
@@ -123,11 +93,12 @@ public class ARPushable : MonoBehaviour
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null) 
                     { // Instantiate the sphere
-                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position + (Vector3.up*0.1f), hitPose.rotation);
                     }
                     else 
                     {
-                        spawnedObject.transform.position = hitPose.position;
+                        spawnedObject.transform.position = hitPose.position + (Vector3.up*0.1f);
+                        spawnedObject.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
                     }
                 }
             }
