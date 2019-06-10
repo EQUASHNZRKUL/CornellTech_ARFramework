@@ -67,8 +67,6 @@ public class ARPushable : MonoBehaviour
     /// </summary>
     void PhysicsRayIntersect(RaycastHit hit) {
         var hitPose = hit.transform;
-        // TODO: This line may be causing the phasing issues
-        hit.collider.enabled = false;
         testObject = Instantiate(m_PhysicalPrefab, hitPose.position, hitPose.rotation);
     }
 
@@ -114,7 +112,6 @@ public class ARPushable : MonoBehaviour
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
                     // Instantiate a new cube
                     var hitPose = hit.transform;
-                    // var viewpoint = Camera.main.WorldToViewportPoint(hit.point);
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
@@ -123,8 +120,9 @@ public class ARPushable : MonoBehaviour
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null)
                     { //Instantiate a new sphere
-                        // TODO: possible fix to enlarged sphere bug - convert to world coordinates
+                        // TODO: possible fix to enlarged sphere bug - use world coords of hitPose/s_Hits[0]
                         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                        spawnedObject.GetComponent<Renderer>().material.color = Color.red;
                     }
                     else
                     {
