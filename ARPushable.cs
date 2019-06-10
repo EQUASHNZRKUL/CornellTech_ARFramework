@@ -106,12 +106,12 @@ public class ARPushable : MonoBehaviour
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
                 Collider spawnedCollider = hit.collider;
-                Rigidbody spawnedRigidBody = hit.rigidbody;
+                // Rigidbody spawnedRigidBody = hit.rigidbody;
                 if ((hit.distance < s_Hits[0].distance) && (spawnedCollider.gameObject.tag != "Plane Spawn")) {
                     // Hit a spawned object
                     var hitPose = hit.transform;
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
-                    // spawnedRigidBody.AddForce(Vector3.up*JUMP_FORCE);
+                    // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
                     // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
                 else { //ARRayIntersect();
