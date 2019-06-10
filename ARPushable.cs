@@ -112,19 +112,19 @@ public class ARPushable : MonoBehaviour
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
-                    // Instantiate a new sphere
+                    // Instantiate a new cube
                     var hitPose = hit.transform;
                     // var viewpoint = Camera.main.WorldToViewportPoint(hit.point);
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
+                    // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
                 else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null)
-                    {
+                    { //Instantiate a new sphere
                         // TODO: possible fix to enlarged sphere bug - convert to world coordinates
-                        // spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                        SendMessageTo(spawnedObject, "OnRayCastEnter");
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
                     }
                     else
                     {
