@@ -115,7 +115,7 @@ public class ARPushable : MonoBehaviour
                     Debug.Log(hit.rigidbody);
                     // TODO: Try translation, could be an issue with Force.
                     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
-                    spawnedObject.transform.Translate(Vector3.up * 0.5);
+                    spawnedObject.transform.Translate(Vector3.up * 0.5f);
                 }
                 else if (spawnedCollider.gameObject.tag == "Plane Spawn") 
                 { // Hits the plane
