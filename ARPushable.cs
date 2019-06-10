@@ -114,8 +114,6 @@ public class ARPushable : MonoBehaviour
                 if ((arRayBool && spawnedCollider.gameObject.tag == "ARPlacedObject") || (!arRayBool))
                 { // Hits a spawned object
                     Debug.Log("Hit a Sphere");
-                    // Debug.Log(hit.distance);
-                    // Debug.Log(s_Hits[0].distance);
                     var hitPose = hit.transform;
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
