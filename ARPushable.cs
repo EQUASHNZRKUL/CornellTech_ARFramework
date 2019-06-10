@@ -54,6 +54,7 @@ public class ARPushable : MonoBehaviour
     /// </summary>
     public static event Action onPlacedObject;
 
+    public float JUMP_FORCE = 10.0f;
 
     void Awake()
     {
@@ -109,11 +110,12 @@ public class ARPushable : MonoBehaviour
             bool physRayBool = Physics.Raycast(ray, out hit);
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
-                if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
-                    // Instantiate a new cube
-                    // var hitPose = hit.transform;
-                    // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
-                    SendMessageTo(spawnedObject, "OnRayCastEnter");
+                Collider spawnedCollider = hit.collider;
+                Rigidbody spawnedRigidBody = hit.rigidbody;
+                if ((hit.distance < s_Hits[0].distance) && (spawnedCollider.gameObject.tag == "AR Placed Object")) {
+                    // Hit a spawned object
+                    spawnedRigidBody.AddForce(Vector3.up*JUMP_FORCE)
+                    // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
                 else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
