@@ -2,13 +2,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
 
-public class RayHitReactSphere : MonoBehaviour, IPointerEnterHandler
+public class RayHitReactSphere : MonoBehaviour
 {
-    public float JUMP_FORCE = 1.0f;
+    public float JUMP_FORCE = 10.0f;
 
-    void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+    // void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+    // {
+    //     Rigidbody m_rigidBody = gameObject.GetComponent<Rigidbody>();
+    //     m_rigidBody.AddForce(Vector3.up * JUMP_FORCE);
+    // }
+
+    void OnRaycastEnter(GameObject sender)
     {
-        Rigidbody m_rigidBody = gameObject.GetComponent<Rigidbody>();
-        m_rigidBody.AddForce(Vector3.up * JUMP_FORCE);
+        GetComponent<Renderer>().material.color = Color.red;
+        // Rigidbody m_rigidBody = GetComponent<Rigidbody>();
+        // m_rigidBody.AddForce(Vector3.up * JUMP_FORCE);
     }
 }

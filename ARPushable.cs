@@ -111,7 +111,7 @@ public class ARPushable : MonoBehaviour
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
-                    SendMessageTo(spawnedObject, OnRaycastEnterMessage);
+                    SendMessageTo(spawnedObject, "OnRayCastEnter");
                     // var hitPose = hit.transform;
                     // var viewpoint = Camera.main.WorldToViewportPoint(hit.point);
                     // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
