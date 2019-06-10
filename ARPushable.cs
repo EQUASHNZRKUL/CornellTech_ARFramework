@@ -107,14 +107,16 @@ public class ARPushable : MonoBehaviour
             // Distance calculations
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(touch.position);
+            Debug.DrawRay (ray.origin, ray.direction * 10, Color.blue);
             bool physRayBool = Physics.Raycast(ray, out hit);
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
             if (physRayBool) { // PhysicsRayIntersect();
                 if ((hit.distance < s_Hits[0].distance) && (hit.collider.gameObject.tag != "Plane Spawn")) {
-                    SendMessageTo(spawnedObject, "OnRayCastEnter");
-                    // var hitPose = hit.transform;
+                    // Instantiate a new sphere
+                    // SendMessageTo(spawnedObject, "OnRayCastEnter");
+                    var hitPose = hit.transform;
                     // var viewpoint = Camera.main.WorldToViewportPoint(hit.point);
-                    // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
+                    testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                 }
                 else { //ARRayIntersect();
                     // Raycast hits are sorted by distance, so the first one will be the closest hit.
