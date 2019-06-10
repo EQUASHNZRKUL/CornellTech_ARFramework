@@ -110,10 +110,9 @@ public class ARPushable : MonoBehaviour
                 Collider spawnedCollider = hit.collider;
                 if ((arRayBool && spawnedCollider.gameObject.tag == "AR Placed Object") || (!arRayBool))
                 { // Hits a spawned object
-                    var hitPose = hit.transform;
-                    testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
-                    // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
-                    // SendMessageTo(spawnedObject, "OnRayCastEnter");
+                    // var hitPose = hit.transform;
+                    // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
+                    hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
                 }
                 else if (spawnedCollider.gameObject.tag == "Plane Spawn") 
                 { // Hits the plane
@@ -128,28 +127,6 @@ public class ARPushable : MonoBehaviour
                         spawnedObject.transform.position = hitPose.position;
                     }
                 }
-
-                // if ((hit.distance < s_Hits[0].distance) && (spawnedCollider.gameObject.tag != "Plane Spawn")) {
-                //     // Hit a spawned object
-                //     var hitPose = hit.transform;
-                //     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
-                //     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
-                //     // SendMessageTo(spawnedObject, "OnRayCastEnter");
-                // }
-                // else { //ARRayIntersect();
-                //     // Raycast hits are sorted by distance, so the first one will be the closest hit.
-                //     var hitPose = s_Hits[0].pose;
-                //     if (spawnedObject == null)
-                //     { //Instantiate a new sphere
-                //         // TODO: possible fix to enlarged sphere bug - use world coords of hitPose/s_Hits[0]
-                //         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                //     }
-                //     else
-                //     {
-                //         spawnedObject.transform.position = hitPose.position;
-                //     }
-                // }
-
             }
         }
     }
@@ -158,6 +135,4 @@ public class ARPushable : MonoBehaviour
     ARRaycastManager m_ARRaycastManager;
 
     ARSessionOrigin m_SessionOrigin;
-
-            // else if (m_ARRaycastManager.Raycast(touchPosition, s_Hits, TrackableType.All))
 }
