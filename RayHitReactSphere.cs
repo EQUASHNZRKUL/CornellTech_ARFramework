@@ -32,8 +32,7 @@ public class RayHitReactSphere : MonoBehaviour
     void OnRaycastEnter(GameObject sender)
     {
         // GetComponent<Renderer>().material.color = Color.red;
-        Rigidbody m_rigidBody = GetComponent<Rigidbody>();
-        space = m_rigidBody.transform;
+        Transform space = GetComponent<Rigidbody>().transform;
         testObject = Instantiate(m_PhysicalPrefab, space.position, space.rotation);
         // m_rigidBody.AddForce(Vector3.up * JUMP_FORCE);
     }
