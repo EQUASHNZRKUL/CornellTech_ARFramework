@@ -122,7 +122,6 @@ public class ARPushable : MonoBehaviour
                     { //Instantiate a new sphere
                         // TODO: possible fix to enlarged sphere bug - use world coords of hitPose/s_Hits[0]
                         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-                        spawnedObject.GetComponent<Renderer>().material.color = Color.red;
                     }
                     else
                     {
