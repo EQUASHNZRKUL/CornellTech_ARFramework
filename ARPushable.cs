@@ -111,7 +111,7 @@ public class ARPushable : MonoBehaviour
             { // PhysicsRayIntersect();
                 Collider spawnedCollider = hit.collider;
                 Debug.Log(spawnedCollider.gameObject.tag);
-                if ((arRayBool && spawnedCollider.gameObject.tag == "ARPlacedObject") || (!arRayBool))
+                if ((arRayBool && spawnedCollider.gameObject.tag == "AR Placed Object") || (!arRayBool))
                 { // Hits a spawned object
                     Debug.Log("Hit a Sphere");
                     var hitPose = hit.transform;
