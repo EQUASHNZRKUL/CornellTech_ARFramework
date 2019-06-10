@@ -53,7 +53,8 @@ public class ARPushable : MonoBehaviour
 
     void Awake()
     {
-        Console.WriteLine("StartTest");
+        // Console.WriteLine("StartTest");
+        Debug.Log("StartTest")
         m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
@@ -101,32 +102,59 @@ public class ARPushable : MonoBehaviour
             // Distance calculations
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(touch.position);
-            Debug.DrawRay (ray.origin, ray.direction * 10, Color.blue);
+            // Debug.DrawRay(ray.origin, ray.direction * 10, Color.blue);
             bool physRayBool = Physics.Raycast(ray, out hit);
+            Debug.Log(physRayBool);
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
-            if (physRayBool) { // PhysicsRayIntersect();
+            if (physRayBool) 
+            { // PhysicsRayIntersect();
                 Collider spawnedCollider = hit.collider;
                 // Rigidbody spawnedRigidBody = hit.rigidbody;
-                if ((hit.distance < s_Hits[0].distance) && (spawnedCollider.gameObject.tag != "Plane Spawn")) {
-                    // Hit a spawned object
+
+                if ((!arRayBool) || (hit.distance < s_Hits[0].distance)) 
+                { // Hits a spawned object
+                    Debug.Log("Hit a Sphere");
                     var hitPose = hit.transform;
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
                     // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
-                else { //ARRayIntersect();
-                    // Raycast hits are sorted by distance, so the first one will be the closest hit.
+                else if ((hit.distance > s_Hits[0].distance) && spawnedCollider.gameObject.tag == "Plane Spawn") 
+                { // Hits the plane
+                    // Works if Physics.Raycast can hit ARPlanes. 
+                    Debug.Log("Hit a Plane");
                     var hitPose = s_Hits[0].pose;
-                    if (spawnedObject == null)
-                    { //Instantiate a new sphere
-                        // TODO: possible fix to enlarged sphere bug - use world coords of hitPose/s_Hits[0]
+                    if (spawnedObject == null) 
+                    { // Instantiate the sphere
                         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
                     }
-                    else
+                    else 
                     {
                         spawnedObject.transform.position = hitPose.position;
                     }
                 }
+
+                // if ((hit.distance < s_Hits[0].distance) && (spawnedCollider.gameObject.tag != "Plane Spawn")) {
+                //     // Hit a spawned object
+                //     var hitPose = hit.transform;
+                //     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
+                //     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
+                //     // SendMessageTo(spawnedObject, "OnRayCastEnter");
+                // }
+                // else { //ARRayIntersect();
+                //     // Raycast hits are sorted by distance, so the first one will be the closest hit.
+                //     var hitPose = s_Hits[0].pose;
+                //     if (spawnedObject == null)
+                //     { //Instantiate a new sphere
+                //         // TODO: possible fix to enlarged sphere bug - use world coords of hitPose/s_Hits[0]
+                //         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+                //     }
+                //     else
+                //     {
+                //         spawnedObject.transform.position = hitPose.position;
+                //     }
+                // }
+
             }
         }
     }
