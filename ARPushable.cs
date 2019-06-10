@@ -54,7 +54,7 @@ public class ARPushable : MonoBehaviour
     void Awake()
     {
         // Console.WriteLine("StartTest");
-        Debug.Log("StartTest")
+        Debug.Log("StartTest");
         m_ARRaycastManager = GetComponent<ARRaycastManager>();
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
     }
@@ -106,30 +106,34 @@ public class ARPushable : MonoBehaviour
             bool physRayBool = Physics.Raycast(ray, out hit);
             Debug.Log(physRayBool);
             bool arRayBool = m_ARRaycastManager.Raycast(touch.position, s_Hits, TrackableType.PlaneWithinPolygon);
+            Debug.Log(arRayBool);
             if (physRayBool) 
             { // PhysicsRayIntersect();
                 Collider spawnedCollider = hit.collider;
-                // Rigidbody spawnedRigidBody = hit.rigidbody;
-
-                if ((!arRayBool) || (hit.distance < s_Hits[0].distance)) 
+                Debug.Log(spawnedCollider.gameObject.tag);
+                if ((arRayBool && spawnedCollider.gameObject.tag == "ARPlacedObject") || (!arRayBool))
                 { // Hits a spawned object
                     Debug.Log("Hit a Sphere");
+                    // Debug.Log(hit.distance);
+                    // Debug.Log(s_Hits[0].distance);
                     var hitPose = hit.transform;
                     testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
                     // SendMessageTo(spawnedObject, "OnRayCastEnter");
                 }
-                else if ((hit.distance > s_Hits[0].distance) && spawnedCollider.gameObject.tag == "Plane Spawn") 
+                else if (spawnedCollider.gameObject.tag == "Plane Spawn") 
                 { // Hits the plane
                     // Works if Physics.Raycast can hit ARPlanes. 
                     Debug.Log("Hit a Plane");
                     var hitPose = s_Hits[0].pose;
                     if (spawnedObject == null) 
                     { // Instantiate the sphere
+                        Debug.Log("Hit a plane & Instantiate the sphere");
                         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
                     }
                     else 
                     {
+                        Debug.Log("Hit a plane & Move the sphere");
                         spawnedObject.transform.position = hitPose.position;
                     }
                 }
