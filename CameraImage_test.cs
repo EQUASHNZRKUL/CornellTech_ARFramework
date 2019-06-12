@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using OpenCVForUnity.CoreModule;
+// using OpenCvForUnity.UnityUtils;
+// using OpenCVForUnity.ImgprocModule;
 
 /// <summary>
 /// Listens for touch events and performs an AR raycast from the screen touch point.
@@ -14,11 +17,20 @@ using UnityEngine.XR.ARSubsystems;
 [RequireComponent(typeof(ARCameraManager))]
 public class CameraImage_test : MonoBehaviour
 {
-
     void Awake()
     {
         Debug.Log("StartTest");
         m_ARCameraManager = GetComponent<ARCameraManager>();
+    }
+
+    void OnEnable()
+    {
+        ARCameraManager.cameraFrameReceived += Update;
+    }
+
+    void OnDisable()
+    {
+        ARCameraManager.cameraFrameReceived -= Update;
     }
 
     void Update()
@@ -29,20 +41,19 @@ public class CameraImage_test : MonoBehaviour
         {
             Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
                 image.dimensions, image.format, image.timestamp);
-            for (int planeIndex = 0; planeIndex < image.planeCount; ++planeIndex)
-            {
-                // Log information about image plane
-                XRCameraImagePlane plane = image.GetPlane(planeIndex);
-                Debug.LogFormat("Plane {0}:\n\tsize: {1}\n\tpixelStride{2}", 
-                    planeIndex, plane.data.Length, plane.pixelStride);
-                
-                // Do something with the data: 
-                // MyCVAlgo(plane.data);
-            }
+            // for (int planeIndex = 0; planeIndex < image.planeCount; ++planeIndex)
+            // {
+            //     // Log information about image plane
+            //     XRCameraImagePlane plane = image.GetPlane(planeIndex);
+            //     Debug.LogFormat("Plane {0}:\n\tsize: {1}\n\tpixelStride{2}", 
+            //         planeIndex, plane.data.Length, plane.pixelStride);
+            // }
 
             image.Dispose();
         }
     }
+
     ARCameraManager m_ARCameraManager;
 
+    Texture2D m_Texture;
 }
