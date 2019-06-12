@@ -84,8 +84,9 @@ public class ARPushable : MonoBehaviour
                     // testObject = Instantiate(m_PhysicalPrefab, hit.point, hitPose.rotation);
                     Debug.Log(hit.rigidbody);
                     Vector3 forceDirection = hit.normal * -1.0f;
-                    // hit.rigidbody.AddForce(Vector3.up*JUMP_FORCE);
-                    spawnedObject.transform.Translate(forceDirection * 0.1f);
+                    spawnedObject.GetComponent<Rigidbody>().AddForce(forceDirection*JUMP_FORCE);
+                    // hit.rigidbody.AddForce(forceDirection*JUMP_FORCE);
+                    // spawnedObject.transform.Translate(forceDirection * 0.1f);
                 }
                 else if (spawnedCollider.gameObject.tag == "Plane Spawn") 
                 { // Hits the plane
@@ -94,6 +95,7 @@ public class ARPushable : MonoBehaviour
                     if (spawnedObject == null) 
                     { // Instantiate the sphere
                         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position + (Vector3.up*0.1f), hitPose.rotation);
+                        spawnedObject.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
                     }
                     else 
                     {
