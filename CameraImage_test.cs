@@ -54,7 +54,7 @@ public class CameraImage_test : MonoBehaviour
             outputDimensions = new Vector2Int(image.width / 2, image.height / 2),
 
             // Choose RGBA format
-            outputFormat = TextureFormat.RGBA32,
+            outputFormat = TextureFormat.Alpha8,
 
             // No Transformation
             transformation = CameraImageTransformation.None
