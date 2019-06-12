@@ -27,15 +27,15 @@ public class CameraImage_test : MonoBehaviour
 
     void OnEnable()
     {
-        ARCameraManager.cameraFrameReceived += Update;
+        m_ARCameraManager.frameReceived += Update;
     }
 
     void OnDisable()
     {
-        ARCameraManager.cameraFrameReceived -= Update;
+        m_ARCameraManager.frameReceived -= Update;
     }
 
-    unsafe void Update()
+    unsafe void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
     {
         // CAMERA IMAGE HANDLING
         XRCameraImage image;
@@ -45,8 +45,8 @@ public class CameraImage_test : MonoBehaviour
         Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
             image.dimensions, image.format, image.timestamp);
 
-        XRCameraImageConversionParams conversionParams = new CameraImageConversionParams
-        (
+        var conversionParams = new XRCameraImageConversionParams
+        {
             // Get entire image
             inputRect = new RectInt(0, 0, image.width, image.height),
 
@@ -58,10 +58,10 @@ public class CameraImage_test : MonoBehaviour
 
             // No Transformation
             transformation = CameraImageTransformation.None
-        );
+        };
 
         // Get byte size of final image
-        int size = BadImageFormatException.GetConvertedDataSize(conversionParams);
+        int size = image.GetConvertedDataSize(conversionParams);
 
         // Allocate buffer to store image
         var buffer = new NativeArray<byte>(size, Allocator.Temp);
