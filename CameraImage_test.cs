@@ -44,44 +44,24 @@ public class CameraImage_test : MonoBehaviour
 
         Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
             image.dimensions, image.format, image.timestamp);
+        
+        CameraImagePlane greyscale = image.GetPlane(0);
 
-        var conversionParams = new XRCameraImageConversionParams
-        {
-            // Get entire image
-            inputRect = new RectInt(0, 0, image.width, image.height),
-
-            // Downsample by 2
-            outputDimensions = new Vector2Int(image.width / 2, image.height / 2),
-
-            // Choose RGBA format
-            outputFormat = TextureFormat.Alpha8,
-
-            // No Transformation
-            transformation = CameraImageTransformation.None
-        };
-
-        // Get byte size of final image
-        int size = image.GetConvertedDataSize(conversionParams);
-
-        // Allocate buffer to store image
-        var buffer = new NativeArray<byte>(size, Allocator.Temp);
-
-        // Extract image data
-        image.Convert(conversionParams, new IntPtr(buffer.GetUnsafePtr()), buffer.Length);
-
-        // Image is stored, so we can safely discard the XRCameraImage object
         image.Dispose();
 
         // Process the image here: 
-            m_Texture = new Texture2D(
-                conversionParams.outputDimensions.x,
-                conversionParams.outputDimensions.y,
-                conversionParams.outputFormat,
-                false);
-            
-            m_Texture.LoadRawTextureData(buffer);
-            m_Texture.Apply();
-            buffer.Dispose();
+        
+
+
+        // m_Texture = new Texture2D(
+        //     conversionParams.outputDimensions.x,
+        //     conversionParams.outputDimensions.y,
+        //     conversionParams.outputFormat,
+        //     false);
+        
+        // m_Texture.LoadRawTextureData(buffer);
+        // m_Texture.Apply();
+        // buffer.Dispose();
     }
 
     void Update() {
