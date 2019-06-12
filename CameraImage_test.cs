@@ -5,9 +5,10 @@ using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using OpenCVForUnity;
 using OpenCVForUnity.CoreModule;
-// using OpenCvForUnity.UnityUtils;
-// using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UnityUtils;
+using OpenCVForUnity.ImgprocModule;
 
 /// <summary>
 /// Listens for touch events and performs an AR raycast from the screen touch point.
@@ -19,6 +20,10 @@ using OpenCVForUnity.CoreModule;
 [RequireComponent(typeof(ARCameraManager))]
 public class CameraImage_test : MonoBehaviour
 {
+    public ARCameraManager m_ARCameraManager;
+    private Mat imageMat;
+    private Texture2D m_Texture;
+
     void Awake()
     {
         Debug.Log("StartTest");
@@ -35,7 +40,13 @@ public class CameraImage_test : MonoBehaviour
         m_ARCameraManager.frameReceived -= OnCameraFrameReceived;
     }
 
-    unsafe void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
+    void ComputerVisionAlgo(IntPtr greyscale) 
+    {
+        Utils.copyToMat(greyscale, imageMat);
+        Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
+    }
+
+    void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
     {
         // CAMERA IMAGE HANDLING
         XRCameraImage image;
@@ -44,13 +55,19 @@ public class CameraImage_test : MonoBehaviour
 
         Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
             image.dimensions, image.format, image.timestamp);
+        int w = image.dimensions[0];
+        int h = image.dimensions[1];
         
-        CameraImagePlane greyscale = image.GetPlane(0);
+        XRCameraImagePlane greyscale = image.GetPlane(0);
 
         image.Dispose();
 
         // Process the image here: 
-        
+        // ComputerVisionAlgo(greyscale);
+        unsafe {
+            IntPtr greyPtr = (IntPtr) greyscale.data.GetUnsafePtr();
+            ComputerVisionAlgo(greyPtr);
+        }
 
 
         // m_Texture = new Texture2D(
@@ -63,12 +80,4 @@ public class CameraImage_test : MonoBehaviour
         // m_Texture.Apply();
         // buffer.Dispose();
     }
-
-    void Update() {
-
-    }
-
-    ARCameraManager m_ARCameraManager;
-
-    Texture2D m_Texture;
 }
