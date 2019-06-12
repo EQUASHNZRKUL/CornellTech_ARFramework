@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -33,24 +35,53 @@ public class CameraImage_test : MonoBehaviour
         ARCameraManager.cameraFrameReceived -= Update;
     }
 
-    void Update()
+    unsafe void Update()
     {
         // CAMERA IMAGE HANDLING
         XRCameraImage image;
-        if (m_ARCameraManager.TryGetLatestImage(out image))
-        {
-            Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
-                image.dimensions, image.format, image.timestamp);
-            // for (int planeIndex = 0; planeIndex < image.planeCount; ++planeIndex)
-            // {
-            //     // Log information about image plane
-            //     XRCameraImagePlane plane = image.GetPlane(planeIndex);
-            //     Debug.LogFormat("Plane {0}:\n\tsize: {1}\n\tpixelStride{2}", 
-            //         planeIndex, plane.data.Length, plane.pixelStride);
-            // }
+        if (!m_ARCameraManager.TryGetLatestImage(out image))
+            return;
 
-            image.Dispose();
-        }
+        Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
+            image.dimensions, image.format, image.timestamp);
+
+        XRCameraImageConversionParams conversionParams = new CameraImageConversionParams
+        (
+            // Get entire image
+            inputRect = new RectInt(0, 0, image.width, image.height),
+
+            // Downsample by 2
+            outputDimensions = new Vector2Int(image.width / 2, image.height / 2),
+
+            // Choose RGBA format
+            outputFormat = TextureFormat.RGBA32,
+
+            // No Transformation
+            transformation = CameraImageTransformation.None
+        );
+
+        // Get byte size of final image
+        int size = BadImageFormatException.GetConvertedDataSize(conversionParams);
+
+        // Allocate buffer to store image
+        var buffer = new NativeArray<byte>(size, Allocator.Temp);
+
+        // Extract image data
+        image.Convert(conversionParams, new IntPtr(buffer.GetUnsafePtr()), buffer.Length);
+
+        // Image is stored, so we can safely discard the XRCameraImage object
+        image.Dispose();
+
+        // Process the image here: 
+            m_Texture = new Texture2D(
+                conversionParams.outputDimensions.x,
+                conversionParams.outputDimensions.y,
+                conversionParams.outputFormat,
+                false);
+            
+            m_Texture.LoadRawTextureData(buffer);
+            m_Texture.Apply();
+            buffer.Dispose();
     }
 
     ARCameraManager m_ARCameraManager;
