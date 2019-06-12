@@ -27,12 +27,12 @@ public class CameraImage_test : MonoBehaviour
 
     void OnEnable()
     {
-        m_ARCameraManager.frameReceived += Update;
+        m_ARCameraManager.frameReceived += OnCameraFrameReceived;
     }
 
     void OnDisable()
     {
-        m_ARCameraManager.frameReceived -= Update;
+        m_ARCameraManager.frameReceived -= OnCameraFrameReceived;
     }
 
     unsafe void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
@@ -82,6 +82,10 @@ public class CameraImage_test : MonoBehaviour
             m_Texture.LoadRawTextureData(buffer);
             m_Texture.Apply();
             buffer.Dispose();
+    }
+
+    void Update() {
+
     }
 
     ARCameraManager m_ARCameraManager;
