@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using OpenCVForUnity;
@@ -17,12 +18,28 @@ using OpenCVForUnity.ImgprocModule;
 /// If a raycast hits a trackable, the <see cref="placedPrefab"/> is instantiated
 /// and moved to the hit position.
 /// </summary>
-[RequireComponent(typeof(ARCameraManager))]
+// [RequireComponent(typeof(ARCameraManager))]
+// [RequireComponent(typeof(RawImage))]
 public class CameraImage_test : MonoBehaviour
 {
-    public ARCameraManager m_ARCameraManager;
-    private Mat imageMat;
-    private Texture2D m_Texture;
+    public Mat imageMat;
+    public Texture2D m_Texture;
+
+    [SerializeField]
+    ARCameraManager m_ARCameraManager;
+    public ARCameraManager cameraManager
+    {
+        get {return m_ARCameraManager; }
+        set {m_ARCameraManager = value; }
+    }
+
+    [SerializeField]
+    RawImage m_RawImage;
+    public RawImage rawImage 
+    {
+        get { return m_RawImage; }
+        set { m_RawImage = value; }
+    }
 
     void Awake()
     {
@@ -42,8 +59,11 @@ public class CameraImage_test : MonoBehaviour
 
     void ComputerVisionAlgo(IntPtr greyscale) 
     {
+        Debug.Log("Computer Vision Algo-ing");
         Utils.copyToMat(greyscale, imageMat);
-        Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
+        Mat tempMat; 
+        Imgproc.threshold(imageMat, tempMat, 128, 255, Imgproc.THRESH_BINARY_INV);
+        imageMat = tempMat;
     }
 
     void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
@@ -60,6 +80,12 @@ public class CameraImage_test : MonoBehaviour
         
         XRCameraImagePlane greyscale = image.GetPlane(0);
 
+        if (m_Texture == null || m_Texture.width != image.width || m_Texture.height != image.height)
+        {
+            var format = TextureFormat.R8;
+            m_Texture = new Texture2D(image.width, image.height, format, false);
+        }
+
         image.Dispose();
 
         // Process the image here: 
@@ -67,8 +93,14 @@ public class CameraImage_test : MonoBehaviour
         unsafe {
             IntPtr greyPtr = (IntPtr) greyscale.data.GetUnsafePtr();
             ComputerVisionAlgo(greyPtr);
+            Debug.LogFormat("imageMat Dimensions: {0}, {1}", imageMat.rows(), imageMat.cols());
+            Utils.fastMatToTexture2D(imageMat, m_Texture, true, 0);
+            Debug.LogFormat("m_Texture Dimensions: {0}, {1}", m_Texture.height, m_Texture.width);
         }
 
+        m_Texture.Apply();
+
+        m_RawImage.texture = m_Texture;
 
         // m_Texture = new Texture2D(
         //     conversionParams.outputDimensions.x,
