@@ -22,8 +22,9 @@ using OpenCVForUnity.ImgprocModule;
 // [RequireComponent(typeof(RawImage))]
 public class CameraImage_test : MonoBehaviour
 {
-    public Mat imageMat;
+    public Mat imageMat = new Mat(480, 640, CvType.CV_8UC1);
     public Texture2D m_Texture;
+    private int iterate = 0; 
 
     [SerializeField]
     ARCameraManager m_ARCameraManager;
@@ -44,7 +45,8 @@ public class CameraImage_test : MonoBehaviour
     void Awake()
     {
         Debug.Log("StartTest");
-        m_ARCameraManager = GetComponent<ARCameraManager>();
+        // m_ARCameraManager = GetComponent<ARCameraManager>();
+        // m_RawImage = GetComponent<RawImage>();
     }
 
     void OnEnable()
@@ -61,9 +63,7 @@ public class CameraImage_test : MonoBehaviour
     {
         Debug.Log("Computer Vision Algo-ing");
         Utils.copyToMat(greyscale, imageMat);
-        Mat tempMat; 
-        Imgproc.threshold(imageMat, tempMat, 128, 255, Imgproc.THRESH_BINARY_INV);
-        imageMat = tempMat;
+        Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
     }
 
     void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
@@ -99,7 +99,7 @@ public class CameraImage_test : MonoBehaviour
         }
 
         m_Texture.Apply();
-
+        // Debug.Log("Raw Image Texture Assignment");
         m_RawImage.texture = m_Texture;
 
         // m_Texture = new Texture2D(
