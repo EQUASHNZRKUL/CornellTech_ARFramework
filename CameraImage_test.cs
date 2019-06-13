@@ -61,10 +61,16 @@ public class CameraImage_test : MonoBehaviour
 
     void ComputerVisionAlgo(IntPtr greyscale) 
     {
-        Debug.Log("Computer Vision Algo-ing");
+        // Debug.Log("Computer Vision Algo-ing");
         Utils.copyToMat(greyscale, imageMat);
         Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
+        Debug.LogFormat("Mat Dimensions: {0} x {1}", imageMat.cols(), imageMat.rows());
     }
+
+    // void ConfigureImageInSpace()
+    // {
+        
+    // }
 
     void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
     {
@@ -75,8 +81,6 @@ public class CameraImage_test : MonoBehaviour
 
         Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
             image.dimensions, image.format, image.timestamp);
-        int w = image.dimensions[0];
-        int h = image.dimensions[1];
         
         XRCameraImagePlane greyscale = image.GetPlane(0);
 
@@ -93,14 +97,15 @@ public class CameraImage_test : MonoBehaviour
         unsafe {
             IntPtr greyPtr = (IntPtr) greyscale.data.GetUnsafePtr();
             ComputerVisionAlgo(greyPtr);
-            Debug.LogFormat("imageMat Dimensions: {0}, {1}", imageMat.rows(), imageMat.cols());
             Utils.fastMatToTexture2D(imageMat, m_Texture, true, 0);
-            Debug.LogFormat("m_Texture Dimensions: {0}, {1}", m_Texture.height, m_Texture.width);
         }
 
-        m_Texture.Apply();
-        // Debug.Log("Raw Image Texture Assignment");
-        m_RawImage.texture = m_Texture;
+        m_RawImage.texture = (Texture) m_Texture;
+        // m_Texture.Apply();
+        // m_RawImage.texture = (Texture) Texture2D.whiteTexture;
+        Debug.Log(m_Texture.GetPixel(300, 300));
+        Debug.LogFormat("Texture Dimensions: {0} x {1}", m_Texture.width, m_Texture.height);
+
 
         // m_Texture = new Texture2D(
         //     conversionParams.outputDimensions.x,
