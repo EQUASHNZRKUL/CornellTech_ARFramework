@@ -39,7 +39,7 @@ public class CameraImage_test : MonoBehaviour
     // private Vector2 lowerLeftScreen;
     // private Vector2 lowerRightScreen;
 
-    // private ScreenOrientation? m_CachedOrientation = null;
+    private ScreenOrientation? m_CachedOrientation = null;
     // private Vector2 m_CachedScreenDimensions = Vector2.zero;
 
     [SerializeField]
@@ -79,7 +79,6 @@ public class CameraImage_test : MonoBehaviour
     {
         Utils.copyToMat(greyscale, imageMat);
         Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
-        // Debug.LogFormat("Mat Dimensions: {0} x {1}", imageMat.cols(), imageMat.rows());
     }
 
     void ConfigureRawImageInSpace(int img_w, int img_h)
@@ -100,15 +99,19 @@ public class CameraImage_test : MonoBehaviour
         // Screen / Camera Ratios; Larger one is used as general multiplier to maintain proportionality
         float w_ratio = (float)scr_w/(float)img_w;
         float h_ratio = (float)scr_h/(float)img_h;
-        float multi = Math.Max(w_ratio, h_ratio);
+        float scale = Math.Max(w_ratio, h_ratio);
 
-        int new_w = (int) (img_w * multi);
-        int new_h = (int) (img_h * multi);
+        // int new_w = (int) (img_w * scale);
+        // int new_h = (int) (img_h * scale);
+
+        // int new_w = img_w; 
+        // int new_h = img_h;
 
         Debug.LogFormat("\n Old Dimensions: {0} x {1} \n New Dimensions: {2} x {3}", img_w, img_h, new_w, new_h);
 
         m_RawImage.transform.position = new Vector3(-new_w/2, new_h/2, 0);
-        m_RawImage.uvRect = new UnityEngine.Rect(-new_w/2, new_h/2, new_w, new_h);
+        m_RawImage.transform.localScale = m_RawImage.transform.localScale * scale;
+        // m_RawImage.uvRect = new UnityEngine.Rect(-new_w/2, new_h/2, new_w, new_h);
     }
 
     void BuildGreyscaleTexture(Texture2D Y)
@@ -130,15 +133,10 @@ public class CameraImage_test : MonoBehaviour
         if (m_Texture == null || m_Texture.width != image.width || m_Texture.height != image.height)
         {
             // var format = TextureFormat.RGB24;
-            var format = TextureFormat.R8;
-            Texture2D YTexture = new Texture2D(image.width, image.height, format, false);
-            m_Texture = new Texture2D(image.width, image.height, TextureFormat.RGB24, false);
+            var format = TextureFormat.R8; // CAUSES WHITESCREENING IF RGB24
+            // Texture2D YTexture = new Texture2D(image.width, image.height, TextureFormat.R8, false);
+            m_Texture = new Texture2D(image.width, image.height, format, false);
         }
-
-        int img_w = image.width;
-        int img_h = image.height;
-
-        image.Dispose();
 
         // Process the image here: 
         unsafe {
@@ -147,9 +145,15 @@ public class CameraImage_test : MonoBehaviour
             Utils.fastMatToTexture2D(imageMat, m_Texture, true, 0);
         }
 
-        ConfigureRawImageInSpace(img_w, img_h);
+        if (m_CachedOrientation != Screen.orientation)
+        {
+            m_CachedOrientation = Screen.orientation;
+            ConfigureRawImageInSpace(image.width, image.height);
+        }
 
-        BuildGreyscaleTexture(out YTexture); 
+        image.Dispose();
+
+        // BuildGreyscaleTexture(out YTexture); 
 
         m_Texture.Resize(Screen.width, Screen.height); 
 
@@ -158,8 +162,5 @@ public class CameraImage_test : MonoBehaviour
         Debug.Log(m_Texture.GetPixel(300, 300));
         Debug.LogFormat("Texture Dimensions: {0} x {1}", m_Texture.width, m_Texture.height);
         // m_RawImage.SetNativeSize();
-        // Debug.Log(m_Texture.GetPixel(300, 300));
-        // Debug.LogFormat("Texture Dimensions: {0} x {1}", m_Texture.width, m_Texture.height);
-
     }
 }
