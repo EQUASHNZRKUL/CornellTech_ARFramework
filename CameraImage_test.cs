@@ -39,6 +39,9 @@ public class CameraImage_test : MonoBehaviour
     // private Vector2 lowerLeftScreen;
     // private Vector2 lowerRightScreen;
 
+    private int m_cachedWidth = 0;
+    private int m_cachedHeight = 0;
+
     private ScreenOrientation? m_CachedOrientation = null;
     // private Vector2 m_CachedScreenDimensions = Vector2.zero;
 
@@ -81,6 +84,23 @@ public class CameraImage_test : MonoBehaviour
         Imgproc.threshold(imageMat, imageMat, 128, 255, Imgproc.THRESH_BINARY_INV);
     }
 
+    void ConfigureImageInSpace()
+    {
+        // if (m_CachedOrientation != Screen.orientation || m_CachedScreenDimensions.x != Screen.width)
+        // {
+        //     m_CachedOrientation = Screen.orientation;
+        //     m_CachedScreenDimensions = new Vector2(Screen.width, Screen.height);
+        // }
+
+        Vector2 ScreenDimension = new Vector2(Screen.width, Screen.height);
+        Debug.LogFormat("Screen Dimensions: {0} x {1} \n Screen Orientation: {2}", 
+            Screen.width, Screen.height, Screen.orientation);
+        int w = Screen.width;
+        int h = Screen.height; 
+        m_RawImage.transform.position = new Vector3(-w/2, h/2, 0);
+        m_RawImage.uvRect = new UnityEngine.Rect(-w/2, h/2, w, h);
+    }
+
     void ConfigureRawImageInSpace(int img_w, int img_h)
     {
         // if (m_CachedOrientation != Screen.orientation || m_CachedScreenDimensions.x != Screen.width)
@@ -96,22 +116,19 @@ public class CameraImage_test : MonoBehaviour
         int scr_w = Screen.width;
         int scr_h = Screen.height; 
         
-        // Screen / Camera Ratios; Larger one is used as general multiplier to maintain proportionality
+        // Screen/Camera Ratios; Larger one is used as general multiplier to maintain proportionality
         float w_ratio = (float)scr_w/(float)img_w;
         float h_ratio = (float)scr_h/(float)img_h;
         float scale = Math.Max(w_ratio, h_ratio);
 
-        // int new_w = (int) (img_w * scale);
-        // int new_h = (int) (img_h * scale);
-
-        // int new_w = img_w; 
-        // int new_h = img_h;
+        int new_w = (int) (img_w * scale);
+        int new_h = (int) (img_h * scale);
 
         Debug.LogFormat("\n Old Dimensions: {0} x {1} \n New Dimensions: {2} x {3}", img_w, img_h, new_w, new_h);
 
-        m_RawImage.transform.position = new Vector3(-new_w/2, new_h/2, 0);
+        m_RawImage.transform.position = new Vector3(-scr_w/2, scr_h/2, 0);
+        m_RawImage.uvRect = new UnityEngine.Rect(-scr_w/2, scr_h/2, img_w, img_h);
         m_RawImage.transform.localScale = m_RawImage.transform.localScale * scale;
-        // m_RawImage.uvRect = new UnityEngine.Rect(-new_w/2, new_h/2, new_w, new_h);
     }
 
     void BuildGreyscaleTexture(Texture2D Y)
@@ -123,23 +140,29 @@ public class CameraImage_test : MonoBehaviour
         // CAMERA IMAGE HANDLING
         XRCameraImage image;
         if (!m_ARCameraManager.TryGetLatestImage(out image))
+            Debug.Log("Uh OH");
             return;
-
-        // Debug.LogFormat("Dimensions: {0}\n\t Format: {1}\n\t Time: {2}\n\t ", 
-        //     image.dimensions, image.format, image.timestamp);
+        
+        Debug.Log("FRAME");
         
         XRCameraImagePlane greyscale = image.GetPlane(0);
 
-        if (m_Texture == null || m_Texture.width != image.width || m_Texture.height != image.height)
+        if (m_Texture == null || m_cachedWidth != image.width || m_cachedHeight != image.height)
         {
-            // var format = TextureFormat.RGB24;
+            Debug.Log("Updating Texture Parameters");
+            // TODO: Check for orientation
+            // Update Cached Values
+            m_cachedWidth = image.width;
+            m_cachedHeight = image.height;
+
+            // Make new Texture
             var format = TextureFormat.R8; // CAUSES WHITESCREENING IF RGB24
-            // Texture2D YTexture = new Texture2D(image.width, image.height, TextureFormat.R8, false);
             m_Texture = new Texture2D(image.width, image.height, format, false);
         }
 
         // Process the image here: 
         unsafe {
+            Debug.Log("Processing the image");
             IntPtr greyPtr = (IntPtr) greyscale.data.GetUnsafePtr();
             ComputerVisionAlgo(greyPtr);
             Utils.fastMatToTexture2D(imageMat, m_Texture, true, 0);
@@ -147,6 +170,7 @@ public class CameraImage_test : MonoBehaviour
 
         if (m_CachedOrientation != Screen.orientation)
         {
+            Debug.Log("Configuring RawImage");
             m_CachedOrientation = Screen.orientation;
             ConfigureRawImageInSpace(image.width, image.height);
         }
