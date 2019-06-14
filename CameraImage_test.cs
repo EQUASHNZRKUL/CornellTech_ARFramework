@@ -23,6 +23,7 @@ using OpenCVForUnity.ImgprocModule;
 public class CameraImage_test : MonoBehaviour
 {
     public Mat imageMat = new Mat(480, 640, CvType.CV_8UC1);
+    // public Texture2D m_redTexture;
     public Texture2D m_Texture;
     private int iterate = 0; 
 
@@ -81,7 +82,7 @@ public class CameraImage_test : MonoBehaviour
         // Debug.LogFormat("Mat Dimensions: {0} x {1}", imageMat.cols(), imageMat.rows());
     }
 
-    void ConfigureImageInSpace()
+    void ConfigureRawImageInSpace(int img_w, int img_h)
     {
         // if (m_CachedOrientation != Screen.orientation || m_CachedScreenDimensions.x != Screen.width)
         // {
@@ -92,10 +93,26 @@ public class CameraImage_test : MonoBehaviour
         Vector2 ScreenDimension = new Vector2(Screen.width, Screen.height);
         Debug.LogFormat("Screen Dimensions: {0} x {1} \n Screen Orientation: {2}", 
             Screen.width, Screen.height, Screen.orientation);
-        int w = Screen.width;
-        int h = Screen.height; 
-        m_RawImage.transform.position = new Vector3(-w/2, h/2, 0);
-        m_RawImage.uvRect = new UnityEngine.Rect(-w/2, h/2, w, h);
+
+        int scr_w = Screen.width;
+        int scr_h = Screen.height; 
+        
+        // Screen / Camera Ratios; Larger one is used as general multiplier to maintain proportionality
+        float w_ratio = (float)scr_w/(float)img_w;
+        float h_ratio = (float)scr_h/(float)img_h;
+        float multi = Math.Max(w_ratio, h_ratio);
+
+        int new_w = (int) (img_w * multi);
+        int new_h = (int) (img_h * multi);
+
+        Debug.LogFormat("\n Old Dimensions: {0} x {1} \n New Dimensions: {2} x {3}", img_w, img_h, new_w, new_h);
+
+        m_RawImage.transform.position = new Vector3(-new_w/2, new_h/2, 0);
+        m_RawImage.uvRect = new UnityEngine.Rect(-new_w/2, new_h/2, new_w, new_h);
+    }
+
+    void BuildGreyscaleTexture(Texture2D Y)
+    {
     }
 
     void OnCameraFrameReceived(ARCameraFrameEventArgs eventArgs)
@@ -112,9 +129,14 @@ public class CameraImage_test : MonoBehaviour
 
         if (m_Texture == null || m_Texture.width != image.width || m_Texture.height != image.height)
         {
-            var format = TextureFormat.RGB24;
-            m_Texture = new Texture2D(image.width, image.height, format, false);
+            // var format = TextureFormat.RGB24;
+            var format = TextureFormat.R8;
+            Texture2D YTexture = new Texture2D(image.width, image.height, format, false);
+            m_Texture = new Texture2D(image.width, image.height, TextureFormat.RGB24, false);
         }
+
+        int img_w = image.width;
+        int img_h = image.height;
 
         image.Dispose();
 
@@ -125,8 +147,13 @@ public class CameraImage_test : MonoBehaviour
             Utils.fastMatToTexture2D(imageMat, m_Texture, true, 0);
         }
 
-        ConfigureImageInSpace();
+        ConfigureRawImageInSpace(img_w, img_h);
 
+        BuildGreyscaleTexture(out YTexture); 
+
+        m_Texture.Resize(Screen.width, Screen.height); 
+
+        m_Texture.Apply();
         m_RawImage.texture = (Texture) m_Texture;
         Debug.Log(m_Texture.GetPixel(300, 300));
         Debug.LogFormat("Texture Dimensions: {0} x {1}", m_Texture.width, m_Texture.height);
