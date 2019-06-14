@@ -159,6 +159,11 @@ public class CameraImage_test : MonoBehaviour
             var format = TextureFormat.R8; // CAUSES WHITESCREENING IF RGB24
             m_Texture = new Texture2D(image.width, image.height, format, false);
         }
+        
+        int w = image.width;
+        int h = image.height;
+
+        image.Dispose();
 
         // Process the image here: 
         unsafe {
@@ -172,10 +177,8 @@ public class CameraImage_test : MonoBehaviour
         {
             Debug.Log("Configuring RawImage");
             m_CachedOrientation = Screen.orientation;
-            ConfigureRawImageInSpace(image.width, image.height);
+            ConfigureRawImageInSpace(w, h);
         }
-
-        image.Dispose();
 
         // BuildGreyscaleTexture(out YTexture); 
 
